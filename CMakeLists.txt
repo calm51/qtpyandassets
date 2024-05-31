@@ -41,12 +41,12 @@ target_link_libraries(${PROJECT_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::AndroidExtr
 # =============================================
 
 set(python38_platform "android")
-set(python38_include ${CMAKE_CURRENT_SOURCE_DIR}/../cpplib-python38/output/include/${python38_platform}/python3.8)
+set(python38_include ${CMAKE_CURRENT_SOURCE_DIR}/../clib-python38/output/include/${python38_platform}/python3.8)
 include_directories(${python38_include})
-set(python38_include__internal ${CMAKE_CURRENT_SOURCE_DIR}/../cpplib-python38/output/include/${python38_platform}/python3.8/internal)
+set(python38_include__internal ${CMAKE_CURRENT_SOURCE_DIR}/../clib-python38/output/include/${python38_platform}/python3.8/internal)
 include_directories(${python38_include__internal})
 
-set(python38_lib_dir ${CMAKE_CURRENT_SOURCE_DIR}/../cpplib-python38/output/lib/${python38_platform}/python3.8)
+set(python38_lib_dir ${CMAKE_CURRENT_SOURCE_DIR}/../clib-python38/output/lib/${python38_platform}/python3.8)
 set(python38_lib1 ${python38_lib_dir}/libpython3.8.so)
 set(python38_lib2 ${python38_lib_dir}/libpython3.so)
 target_link_directories(${PROJECT_NAME} PRIVATE ${python38_lib_dir})
