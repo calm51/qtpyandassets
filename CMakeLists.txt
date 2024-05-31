@@ -30,7 +30,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::Core Qt${QT
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-ADD_CUSTOM_COMMAND(TARGET ${PROJECT_NAME} POST_BUILD COMMAND python3 "${CMAKE_SOURCE_DIR}/script/package.py" android)
+ADD_CUSTOM_COMMAND(TARGET ${PROJECT_NAME} POST_BUILD COMMAND python3 "${CMAKE_SOURCE_DIR}/script/output-cpplib.py" android)
 
 add_definitions(-D_HAS_STD_BYTE=0)
 
@@ -41,12 +41,12 @@ target_link_libraries(${PROJECT_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::AndroidExtr
 # =============================================
 
 set(python38_platform "android")
-set(python38_include ${CMAKE_CURRENT_SOURCE_DIR}/../qtlib-python38/output/include/${python38_platform}/python3.8)
+set(python38_include ${CMAKE_CURRENT_SOURCE_DIR}/../cpplib-python38/output/include/${python38_platform}/python3.8)
 include_directories(${python38_include})
-set(python38_include__internal ${CMAKE_CURRENT_SOURCE_DIR}/../qtlib-python38/output/include/${python38_platform}/python3.8/internal)
+set(python38_include__internal ${CMAKE_CURRENT_SOURCE_DIR}/../cpplib-python38/output/include/${python38_platform}/python3.8/internal)
 include_directories(${python38_include__internal})
 
-set(python38_lib_dir ${CMAKE_CURRENT_SOURCE_DIR}/../qtlib-python38/output/lib/${python38_platform}/python3.8)
+set(python38_lib_dir ${CMAKE_CURRENT_SOURCE_DIR}/../cpplib-python38/output/lib/${python38_platform}/python3.8)
 set(python38_lib1 ${python38_lib_dir}/libpython3.8.so)
 set(python38_lib2 ${python38_lib_dir}/libpython3.so)
 target_link_directories(${PROJECT_NAME} PRIVATE ${python38_lib_dir})
