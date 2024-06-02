@@ -1711,13 +1711,14 @@ def _install(_bootstrap_module):
     # of the standard library needed by the bootstrap process to be stored in
     # resource files.
     import pdytools
+    for i in sys.path_hooks:
+        if isinstance(i, pdytools.qrcimporter): break
+    else:
+        sys.path_hooks.insert(0, pdytools.qrcimporter)
+        sys.path = [
+"assets:/python3.8-pyo",
+"assets:/python3.8-pyo/lib-dynload",
+"assets:/python3.8-pyo/site-packages",
+"assets:/python3.8-pyo/base_library.zip",
 
-    sys.path_hooks.insert(0, pdytools.qrcimporter)
-    sys.path = [
-    "assets:/python3.8-pyo",
-    "assets:/python3.8-pyo/lib-dynload",
-    "assets:/python3.8-pyo/site-packages",
-    "assets:/python3.8-pyo/base_library.zip",
-    
-    
-    ]
+]

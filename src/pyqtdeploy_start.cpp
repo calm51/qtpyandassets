@@ -64,7 +64,7 @@ static int handle_exception();
 static int append_path_dirs(PyObject *list, const char **path_dirs);
 
 
-const struct _frozen *PyImport_FrozenModules;
+//const struct _frozen *PyImport_FrozenModules;
 #if PY_VERSION_HEX >= 0x030b0000
 static const struct _frozen frozen_sentinel[] = {{NULL, NULL, 0, false, NULL}};
 const struct _frozen *_PyImport_FrozenBootstrap = frozen_sentinel;
@@ -80,6 +80,60 @@ static const struct _module_alias aliases[] = {
 const struct _module_alias *_PyImport_FrozenAliases = aliases;
 #endif
 
+
+// The replacement table of frozen modules.
+static struct _frozen modules[] = {
+{
+    "_frozen_importlib",
+    frozen_pyqtdeploy_bootstrap,
+    sizeof (frozen_pyqtdeploy_bootstrap),
+#if PY_VERSION_HEX >= 0x030b0000
+    false,
+    NULL,
+#endif
+},
+{
+    "_frozen_importlib_external",
+    frozen_pyqtdeploy_bootstrap_external,
+    sizeof (frozen_pyqtdeploy_bootstrap_external),
+#if PY_VERSION_HEX >= 0x030b0000
+    false,
+    NULL,
+#endif
+},
+{
+    "iimp",
+    frozen_pyqtdeploy_iimp,
+    sizeof (frozen_pyqtdeploy_iimp),
+#if PY_VERSION_HEX >= 0x030b0000
+    false,
+    NULL,
+#endif
+},
+{
+    "zipimport",
+    frozen_pyqtdeploy_zipimport,
+    sizeof (frozen_pyqtdeploy_zipimport),
+#if PY_VERSION_HEX >= 0x030b0000
+    false,
+    NULL,
+#endif
+},
+#if defined(PYQTDEPLOY_FROZEN_MAIN)
+{
+    "__main__",
+    frozen_pyqtdeploy_main,
+    sizeof (frozen_pyqtdeploy_main),
+#if PY_VERSION_HEX >= 0x030b0000
+    false,
+    NULL,
+#endif
+},
+#endif
+{NULL, NULL, 0}
+};
+
+
 #if defined(Q_OS_WIN)
 int pyqtdeploy_start(int argc, wchar_t **w_argv,
                      struct _inittab *extension_modules, const char *main_module,
@@ -90,63 +144,9 @@ int pyqtdeploy_start(int argc, char **argv,
                      const char *entry_point, const char **path_dirs)
 #endif
 {
-    // The replacement table of frozen modules.
-    static struct _frozen modules[] = {
-    {
-        "_frozen_importlib",
-        frozen_pyqtdeploy_bootstrap,
-                sizeof (frozen_pyqtdeploy_bootstrap),
-        #if PY_VERSION_HEX >= 0x030b0000
-                false,
-                NULL,
-        #endif
-    },
-    {
-        "_frozen_importlib_external",
-        frozen_pyqtdeploy_bootstrap_external,
-                sizeof (frozen_pyqtdeploy_bootstrap_external),
-        #if PY_VERSION_HEX >= 0x030b0000
-                false,
-                NULL,
-        #endif
-    },
-    {
-        "iimp",
-        frozen_pyqtdeploy_iimp,
-                sizeof (frozen_pyqtdeploy_iimp),
-        #if PY_VERSION_HEX >= 0x030b0000
-                false,
-                NULL,
-        #endif
-    },
-    {
-        "zipimport",
-        frozen_pyqtdeploy_zipimport,
-                sizeof (frozen_pyqtdeploy_zipimport),
-        #if PY_VERSION_HEX >= 0x030b0000
-                false,
-                NULL,
-        #endif
-    },
-#if defined(PYQTDEPLOY_FROZEN_MAIN)
-    {
-        "__main__",
-        frozen_pyqtdeploy_main,
-                sizeof (frozen_pyqtdeploy_main),
-        #if PY_VERSION_HEX >= 0x030b0000
-                false,
-                NULL,
-        #endif
-    },
-#endif
-    {NULL, NULL, 0}
-};
-
     // Get the codec for the locale.
     locale_codec = QTextCodec::codecForLocale();
-
-    if (!locale_codec)
-    {
+    if (!locale_codec){
 #if defined(Q_OS_WIN)
         fwprintf(stderr, L"%s: no locale codec found\n", w_argv[0]);
 #else
@@ -154,7 +154,6 @@ int pyqtdeploy_start(int argc, char **argv,
 #endif
         return 1;
     }
-
     // Initialise some Python globals.
     Py_FrozenFlag = 1;
     Py_NoSiteFlag = 1;
@@ -162,17 +161,13 @@ int pyqtdeploy_start(int argc, char **argv,
 #if defined(PYQTDEPLOY_OPTIMIZED)
     Py_OptimizeFlag = 1;
 #endif
-
-    if (!Py_FileSystemDefaultEncoding)
-    {
+    //  qDebug()<<"Py_FileSystemDefaultEncoding: "<<(Py_FileSystemDefaultEncoding?"ok":"none")<<"name: "<<locale_codec->name();
+    if (!Py_FileSystemDefaultEncoding){
         // Python doesn't have a platform default so get it from Qt.  However
         // if Qt isn't specific then let Python have a go later.
-
         static QByteArray locale_codec_name;
-
         locale_codec_name = locale_codec->name();
-        if (locale_codec_name != "System")
-        {
+        if (locale_codec_name != "System"){
             Py_FileSystemDefaultEncoding = locale_codec_name.data();
             Py_HasFileSystemDefaultEncoding = 1;
         }
@@ -181,8 +176,7 @@ int pyqtdeploy_start(int argc, char **argv,
     PyImport_FrozenModules = modules;
 
     // Add the importer to the table of builtins.
-    if (PyImport_AppendInittab("pdytools", PyInit_pdytools) < 0)
-    {
+    if (PyImport_AppendInittab("pdytools", PyInit_pdytools) < 0){
 #if defined(Q_OS_WIN)
         fwprintf(stderr, L"%s: PyImport_AppendInittab() failed\n", w_argv[0]);
 #else
@@ -193,8 +187,7 @@ int pyqtdeploy_start(int argc, char **argv,
 
     // Add any extension modules.
     if (extension_modules != NULL)
-        if (PyImport_ExtendInittab(extension_modules) < 0)
-        {
+        if (PyImport_ExtendInittab(extension_modules) < 0){
 #if defined(Q_OS_WIN)
             fwprintf(stderr, L"%s: PyImport_ExtendInittab() failed\n", w_argv[0]);
 #else
@@ -206,25 +199,27 @@ int pyqtdeploy_start(int argc, char **argv,
 #if !defined(Q_OS_WIN)
     // Convert the argument list to wide characters using the locale codec.
     wchar_t **w_argv = new wchar_t *[argc + 1];
-
-    for (int i = 0; i < argc; i++)
-    {
+    for (int i = 0; i < argc; i++){
         QString qs_arg = locale_codec->toUnicode(argv[i]);
-
         wchar_t *w_arg = new wchar_t[qs_arg.length() + 1];
-
         w_arg[qs_arg.toWCharArray(w_arg)] = 0;
-
         w_argv[i] = w_arg;
     }
-
     w_argv[argc] = NULL;
 #endif
-
     // Initialise the Python v3 interpreter.
     Py_SetProgramName(w_argv[0]);
 
     // if (QString::fromWCharArray(Py_GetProgramName()).count()==0){ Py_SetProgramName(QString("python3").toStdWString().c_str()); }
+
+    //    _PyCoreConfig config = _PyCoreConfig_INIT;
+    //    _PyInitError status = _Py_InitializeFromConfig(&config);
+    //    qDebug()<<status.user_err<<QString(QByteArray(status.msg))<<QString(QByteArray(status.prefix));
+    //    //    if (status != PY_SUCCESS) {
+    //    //        fprintf(stderr, "Failed to initialize Python interpreter\n");
+    //    //        qDebug()<<22222222222222;
+    //    //        return 1;
+    //    //    }
 
     //    PyStatus status;
     //    PyConfig config;

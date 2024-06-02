@@ -1324,7 +1324,7 @@ static ModuleType find_module(QrcImporter *self, const QString &fqmn,
     pathname = _lib_dir.absoluteFilePath(fqmn_last);
     filename = _lib_dir.absoluteFilePath("lib"+fqmn_last+".cpython-38.so");
 #ifdef QTPYANDASSETS_DEBUG
-    qDebug()<<pathname<<filename;
+    qDebug()<<pathname; // filename
 #endif
     if (QFileInfo(filename).isFile())
         return ModuleIsAdjacentExtensionModule;
@@ -1516,6 +1516,9 @@ const QDir &pdytools_get_executable_dir()
 // The module initialisation function.
 PyObject *PyInit_pdytools()
 {
+#ifdef QTPYANDASSETS_DEBUG
+    qDebug()<<"PyInit_pdytools";
+#endif
     PyObject *mod;
 
     // Just in case we are linking against Python as a Windows DLL.
